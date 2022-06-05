@@ -1,14 +1,8 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-/*import { initializeApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getDocs, getFirestore } from 'firebase/firestore'; 
-import { collection, getDoc } from 'firebase/firestore';*/
+import { collection, getDoc } from 'firebase/firestore';
 
 
-
-
-/*
 const config = {
     apiKey: "AIzaSyAZDtwzpOhE8dpdPeNQs5E2LlwkFNt_qHk",
     authDomain: "crud-app-a37c2.firebaseapp.com",
@@ -32,16 +26,7 @@ async function getEvents(db) {
     const eventsSnapshot = await getDocs(eventsCol);
     const  eventsList = eventsSnapshot.docs.map(doc => doc.data());
     console.log(eventsList);
+    return eventsList;
 }
 
-
-getEvents(db);
- */
-
-/*
-import { config, app, db, getEvents } from './firebase';
-
-getEvents(db);
-*/
-
-createApp(App).use(router).mount('#app')
+export { db };

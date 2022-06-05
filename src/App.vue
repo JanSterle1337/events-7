@@ -1,30 +1,115 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
+  <NavbarView />
+  <!--<div>
+    {{name}}
+  </div>
+  <div>
+    <button @click="displaySomething">Display</button>
+  </div>
+  <div>
+    <div v-for="event in dataArr" :key="event">
+      {{event.eventID}} {{event.name}} {{event.priority}} {{event.type}}
+    </div>
+  </div>
+  <div>
+    <button @click="addToDatabase">Add data</button>
+  </div> -->
   <router-view/>
 </template>
 
+<script>
+
+import {db} from './firebase';
+import { collection, getDoc, addDoc } from 'firebase/firestore';
+import { getDocs, getFirestore } from 'firebase/firestore'; 
+import NavbarView from './views/NavbarView.vue';
+
+export default {
+  name: 'App',
+  components: { NavbarView},
+  data() {
+    return {
+      name: 'Jancek',
+      dataArr: [],
+    }
+  },
+  
+  methods: {
+   async displaySomething() {
+      const eventsCol = collection(db, 'Events');
+      const eventsSnapshot = await getDocs(eventsCol);
+      const  eventsList = eventsSnapshot.docs.map(doc => doc.data());
+      this.dataArr = eventsList;
+      console.log(eventsList);
+    },
+    async addToDatabase() {
+      try {
+        const docRef = await addDoc(collection(db,"Events"), {
+          eventID: 3,
+          name: 'Spam-click',
+          priority: 10,
+          type: 'Active-click'
+        });
+
+        console.log("Document written with ID ", docRef.id);
+      } catch (err) {
+        console.log("Error adding comment: ", e);
+      }
+    }
+  }
+}
+
+</script>
+
 <style>
+
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
+
+
+html,body {
+  padding: 0px !important;
+  margin: 0px;
+  height: 100%;
+}
+
 
 nav {
-  padding: 30px;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 0px;
+  
 }
 
-nav a {
+.center {
+  width: 50%;
+  background: #42b983;
+}
+
+nav div a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #424242;
+  text-decoration: none;
+  font-size: 3vw;
+  margin: 0px;
+  padding: 1vw;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+nav div a:hover {
+  background: white;
+}
+
+
+nav div a.router-link-exact-active {
+  color: #424242;
 }
 </style>

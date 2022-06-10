@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 /*import { initializeApp } from 'firebase/app';
 import { getDocs, getFirestore } from 'firebase/firestore'; 
 import { collection, getDoc } from 'firebase/firestore';*/
@@ -44,4 +45,4 @@ import { config, app, db, getEvents } from './firebase';
 getEvents(db);
 */
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(store).use(router).mount('#app')

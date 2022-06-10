@@ -63,6 +63,10 @@ export default {
 
 <style>
 
+* {
+  font-family:Arial, Helvetica, sans-serif;
+}
+
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -70,6 +74,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background: white;
   height: 100%;
 }
 
@@ -92,24 +97,38 @@ nav {
 
 .center {
   width: 50%;
-  background: #42b983;
+  background: hsl(343, 70%, 38%);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 nav div a {
   font-weight: bold;
-  color: #424242;
+  color: white;
   text-decoration: none;
   font-size: 3vw;
   margin: 0px;
   padding: 1vw;
+  font-size: 2rem;
 }
 
 nav div a:hover {
+  color:hsl(343, 70%, 38%);
   background: white;
+  
+
 }
 
 
 nav div a.router-link-exact-active {
-  color: #424242;
+  color: white;
+}
+
+
+nav div a.router-link-exact-active:hover {
+   color:hsl(343, 70%, 38%);
+   background: white;
 }
 </style>

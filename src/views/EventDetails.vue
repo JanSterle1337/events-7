@@ -1,24 +1,27 @@
 <template>
   <div class="event-details">
-    <div class="details-wrapper">
-      <h2>name: {{ name }}</h2>
-      <h2>type: {{ type }}</h2>
-      <h2>description: {{ description }}</h2>
-    </div>
-    <div class="priority-wrapper">
-        <h2>priority: {{ priorityWord}}</h2>
-        <div class="priority-box">
-            <div class="white" ref="white"></div>
-            <div class="colored" ref="colored"></div>
+      <div class="center-div">
+        <div class="details-wrapper">
+        <h2>name: {{ name }}</h2>
+        <h2>type: {{ type }}</h2>
+        <h2>description: {{ description }}</h2>
         </div>
-    </div>
+        <div class="priority-wrapper">
+            <h2>priority: {{ priorityWord}}</h2>
+            <div class="priority-box">
+                <div class="white" ref="white"></div>
+                <div class="colored" ref="colored"></div>
+                <p> {{$store.state.name}} </p>
+            </div>
+        </div>
+      </div>
   </div>
   
 </template>
 
 <script>
 
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
 import NavbarView from './NavbarView.vue';
 
@@ -32,12 +35,14 @@ export default {
             whiteBox: null,
             coloredBox: null,
             priorityWord: "",
+            allEvents: [],
         };
     },
     methods: {
-        async getEvent() {
+        async getEvent(id) {
+            console.log("Gettamo event");
             this.eventsRef = collection(db, "Events");
-            const q = query(this.eventsRef, where("eventID", "==", 3));
+            const q = query(this.eventsRef, where("eventID", "==", id));
             const querySnapshot = await getDocs(q);
             console.log(querySnapshot);
             querySnapshot.forEach((doc) => {
@@ -73,11 +78,14 @@ export default {
                 this.priorityWord = "low";
 
             }
-        }
+        },
+        
     },
-    mounted() {
-        /*this.getEvent(); */
+    async mounted() {
+        this.getEvent(4);
         this.checkPriority();
+        
+        /*this.allEvents = await this.$store.dispatch('getEventsQuery');*/
     },
     components: { NavbarView }
 }
@@ -91,8 +99,27 @@ export default {
         align-items: center;
         text-align: left;
         height: 100%;
-        background: #eeee;
+        background: white;
         margin: 0px;
+    }
+
+    .center-div {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        text-align: left;
+        height: 50%;
+        width: 80%;
+        border-radius: 10px;
+        background: #eeee;
+         box-shadow:
+      0 1px 1px hsl(0deg 0% 0% / 0.075),
+      0 2px 2px hsl(0deg 0% 0% / 0.075),
+      0 4px 4px hsl(0deg 0% 0% / 0.075),
+      0 8px 8px hsl(0deg 0% 0% / 0.075),
+      0 16px 16px hsl(0deg 0% 0% / 0.075)
+    ;
     }
 
     .details-wrapper {

@@ -3,7 +3,7 @@ import { getDocs, getFirestore } from 'firebase/firestore';
 import { collection, getDoc } from 'firebase/firestore';
 
 
-const config = {
+const config = {                                                          //DATA FOR CONNECTION TO MY DATABASE
     apiKey: "AIzaSyAZDtwzpOhE8dpdPeNQs5E2LlwkFNt_qHk",
     authDomain: "crud-app-a37c2.firebaseapp.com",
     projectId: "crud-app-a37c2",
@@ -14,19 +14,11 @@ const config = {
 }
 
 
-const app = initializeApp(config);
+const app = initializeApp(config);  //initialize firestore object
 
 const db = getFirestore(app);
 
 console.log(db);
 
-
-async function getEvents(db) {
-    const eventsCol = collection(db, 'Events');
-    const eventsSnapshot = await getDocs(eventsCol);
-    const  eventsList = eventsSnapshot.docs.map(doc => doc.data());
-    console.log(eventsList);
-    return eventsList;
-}
 
 export { db };

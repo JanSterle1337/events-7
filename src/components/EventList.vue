@@ -22,10 +22,17 @@
                 <h2> {{ event.type }} </h2>
             </router-link>
 
-            <router-link :to="{name: 'EventEdit', params: {id: event.eventID}}">
-                <svg class="edit-button" stroke="" fill="#F9A609" stroke-width="0" viewBox="0 0 1024 1024" height="2.5em" width="2.5em" xmlns="http://www.w3.org/2000/svg"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg>
+            <router-link :to="{name: 'EventEdit', 
+            params: {
+                id: event.eventID,
+                name: event.name, 
+                description: event.description, 
+                priority: event.priority, 
+                type: event.type
+                }}" v-if="event.eventID">
+                <svg class="edit-button" stroke="" fill="#fc894d" stroke-width="0" viewBox="0 0 1024 1024" height="2.5em" width="2.5em" xmlns="http://www.w3.org/2000/svg"><path d="M257.7 752c2 0 4-.2 6-.5L431.9 722c2-.4 3.9-1.3 5.3-2.8l423.9-423.9a9.96 9.96 0 0 0 0-14.1L694.9 114.9c-1.9-1.9-4.4-2.9-7.1-2.9s-5.2 1-7.1 2.9L256.8 538.8c-1.5 1.5-2.4 3.3-2.8 5.3l-29.5 168.2a33.5 33.5 0 0 0 9.4 29.8c6.6 6.4 14.9 9.9 23.8 9.9zm67.4-174.4L687.8 215l73.3 73.3-362.7 362.6-88.9 15.7 15.6-89zM880 836H144c-17.7 0-32 14.3-32 32v36c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-36c0-17.7-14.3-32-32-32z"></path></svg>
             </router-link>
-            <svg @click="deleteEvent(event.eventID)" class="delete-button" stroke="currentColor" fill="#FF0000" stroke-width="0" viewBox="0 0 1024 1024" height="2.5em" width="2.5em" xmlns="http://www.w3.org/2000/svg"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"></path></svg> 
+            <svg @click="deleteEvent(event.eventID)" class="delete-button" stroke="currentColor" fill="#f34079" stroke-width="0" viewBox="0 0 1024 1024" height="2.5em" width="2.5em" xmlns="http://www.w3.org/2000/svg"><path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"></path></svg> 
         
       </div>
       <!--<button @click="displayData">Display data</button> -->
@@ -55,14 +62,7 @@ export default {
         }
     },
     methods: {
-       /*async getEvents() {
-        const eventsCol = collection(db, 'Events');
-        const eventsSnapshot = await getDocs(eventsCol);
-        const  eventsList = eventsSnapshot.docs.map(doc => doc.data());
-        this.events = eventsList;
-        this.isLoaded = true;
-        console.log(eventsList);
-        }, */
+       
 
         async getSortedEvents() {
             this.clearEventsArr();
@@ -75,15 +75,14 @@ export default {
             //console.log(doc.id, " => ", doc.data());
             this.sortedEvents.push(doc.data());
             this.isLoaded = true;
+
+            this.$store.commit('updateSortKey',this.keySort);
+
             });
         },
-        /*
-        displayData() {
-            console.log(this.sortedEvents);
-        } */
+        
         async deleteEvent(id) {
-            /*this.eventsRef = collection(db, "Events");
-            console.log(this.eventsRef); */
+            
             const q = query(collection(db, "Events"), where("eventID", "==", id));
             const querySnapshot = await getDocs(q);
             let deleteID = 0;
@@ -95,23 +94,6 @@ export default {
             this.clearEventsArr();
             this.getSortedEvents();
 
-/*
-            const q2 = query(collection(db,"Users"), where("userID", "==", 2));
-            const querySnapshot2 = await getDocs(q2);
-            let deletedID = 0;
-            querySnapshot2.forEach((doc) => {
-                deletedID = doc.id;
-            });
-            console.log(deletedID);
-            await deleteDoc(doc(db,"Users", deletedID));
-            //await deleteDoc(doc(db, "Users", "HTGs1G4QmMCdDxw6Y2p6")); */
-
-            /*querySnapshot.forEach((doc) => {
-                console.log(doc.id);
-                
-             const response = await eventsRef.doc(doc.id).delete();
-            
-            }); */
         },
         clearEventsArr() {
             while (this.sortedEvents.length > 0) {
@@ -123,8 +105,14 @@ export default {
     
 
     mounted() {
-       /*this.getEvents(); */
+       
        this.getSortedEvents();
+      
+    },
+
+    created() {
+        console.log(this.$store.state.sortKey);
+        this.keySort = this.$store.state.sortKey;
     }
      
 }
@@ -178,11 +166,11 @@ export default {
       0 8px 8px hsl(0deg 0% 0% / 0.075),
       0 16px 16px hsl(0deg 0% 0% / 0.075)
     ;
-        min-height: 10rem;
         width: 80%;
         background: white;
         border: 1px solid #eeee;
         border-radius: 10px;
+        margin: 20px;
         
     }
 
@@ -231,4 +219,43 @@ export default {
     .delete-button:hover {
         fill: #C50000;
     }
+
+@media only screen and (max-width: 600px) {
+    .event-wrapper {
+        width: 100%;
+    }
+    select {
+        width: 150px;
+        height: 25px;
+        font-size: 20px;
+        text-align: left;
+        border: 1px solid gray;
+    }
+
+    option {
+        font-size: 15px;
+        padding: 10px;
+        width: 100%;
+    }
+
+    h2 {
+        font-size: 15px;
+    }
+
+    svg {
+        height: 2em;
+        width: 2em;
+    }
+
+    .create-button {
+        height: 36px;
+        width: 140px;
+    }
+
+    .heading {
+        justify-content: center;
+    }
+
+}
+
 </style>

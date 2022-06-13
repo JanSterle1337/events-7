@@ -3,7 +3,7 @@
       <form @submit.prevent="processEvent">
       <div class="row">
           <h1>Create your event</h1>
-          <div style="width: 50%"></div>
+          <div style="width: 50%" class="delete"></div>
       </div>
         
         <div class="row">
@@ -28,6 +28,7 @@
         </div>
          <p class="length-text">{{ maxDescLength }} / {{ currentLength}}</p> 
          <p class="alert">{{ errors}}</p>
+         <p class="sucess">{{ success }}</p>
         <div class="button-wrapper">
           <button name="submit"><span class="text">Add event</span></button>
         </div>
@@ -57,6 +58,7 @@ export default {
             maxEvent: [],
             maxID: 0,
             errors: "",
+            success: "",
         }
     },
     methods: {
@@ -75,6 +77,8 @@ export default {
                await this.getLastEvent();
                await this.uploadData();
                this.errors = "";
+               this.success = "Event was successfully uploaded to the database";
+               setTimeout( () => this.$router.push({ path: '/'}), 3000);
                 
             } else {     
                 setTimeout(function () { this.fetchHole() }.bind(this), 1000);
@@ -108,7 +112,7 @@ export default {
         checkType() {
             let typeRegex = new RegExp(/^[A-z0-9]+\-?[A-z0-9]*$/i);
 
-            if (this.type.length > 3 && this.type.length < 30) {
+            if (this.type.length >= 3 && this.type.length < 30) {
                 if (typeRegex.test(this.type)) {
                     return true;
                 } else {
@@ -160,9 +164,7 @@ export default {
             querySnapshot.forEach((doc) => {
                 this.maxEvent = doc.data();
 
-                if (this.maxEvent == undefined) {
-                    this.maxID = 1;
-                }
+                
                 console.log("Max event: ", this.maxEvent);
                 this.maxID = this.maxEvent.eventID + 1;
                 //console.log(doc.id, " => ", doc.data());
@@ -207,6 +209,11 @@ export default {
         font-weight: bold;
     }
 
+    .sucess {
+        color:#42b983;
+        font-weight: bold;
+    }
+
     .length-text {
         margin-left: 3rem;
     }
@@ -234,7 +241,7 @@ export default {
         
         border-radius: 10px;
         min-width: 70%;
-        height: 70%;
+        height: auto;
         justify-content: center;
         border-top: 3rem solid #eeee;
         margin-top: -100px;
@@ -309,6 +316,7 @@ export default {
   -webkit-user-select: none;
   touch-action: manipulation;
   margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 button:active {
@@ -343,6 +351,21 @@ h1 {
   button span {
     line-height: 50px;
   }
+}
+
+@media screen and (max-width: 600px) { 
+    form {
+        width: 100%;
+        height: auto;
+    }
+    h1 {
+        width: 100%;
+        text-align: center;
+    }
+
+    .delete {
+        width: 0% !important;
+    }
 }
 
     input {
@@ -383,4 +406,5 @@ h1 {
         width: 100%;
         text-align: center;
     }
+
 </style>

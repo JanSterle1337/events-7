@@ -1,19 +1,5 @@
 <template>
   <NavbarView />
-  <!--<div>
-    {{name}}
-  </div>
-  <div>
-    <button @click="displaySomething">Display</button>
-  </div>
-  <div>
-    <div v-for="event in dataArr" :key="event">
-      {{event.eventID}} {{event.name}} {{event.priority}} {{event.type}}
-    </div>
-  </div>
-  <div>
-    <button @click="addToDatabase">Add data</button>
-  </div> -->
   <router-view/>
 </template>
 
@@ -95,40 +81,5 @@ nav {
   
 }
 
-.center {
-  width: 50%;
-  background: hsl(343, 70%, 38%);
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
 
-nav div a {
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
-  font-size: 3vw;
-  margin: 0px;
-  padding: 1vw;
-  font-size: 2rem;
-}
-
-nav div a:hover {
-  color:hsl(343, 70%, 38%);
-  background: white;
-  
-
-}
-
-
-nav div a.router-link-exact-active {
-  color: white;
-}
-
-
-nav div a.router-link-exact-active:hover {
-   color:hsl(343, 70%, 38%);
-   background: white;
-}
 </style>

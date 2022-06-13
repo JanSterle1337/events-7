@@ -5,16 +5,17 @@ import { db } from '../firebase';
 
 export default createStore({
     state: {
-        events: [],
-        event: null,
-        name: 'Jancek',
-        sortedEvents: [],
+        sortKey: "eventID"
     },
     mutations: {
-
+        updateSortKey(state,newVal) {
+            state.sortKey = newVal;
+        }
     },
     actions: {
-        
+        updateSortKey( { commit }, newVal) {
+            commit('setSortKey',newVal);
+        }
     },
     getters: {
 

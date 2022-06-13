@@ -1,13 +1,452 @@
 <template>
-  eventedit
+    <div class="input-form-wrapper">
+      <form @submit.prevent="processEvent">
+      <div class="row">
+          <h1>Edit your event</h1>
+          <div style="width: 50%" class="delete"></div>
+      </div>
+        
+        <div class="row">
+            <label>name your event</label>
+            <input type="text" placeholder="double-click" name="name" v-model="name"/>
+        </div>
+
+        <div class="row">
+          <label>type</label>
+          <input type="text" placeholder="mobile" name="type" v-model="type"/>
+        </div>
+
+        <div class="row">
+          <label>priority</label>
+          <input type="number" placeholder="3" name="priority" v-model="priority"/>
+        </div>
+
+        <div class="row">
+          <label>description</label>
+          <textarea v-model="description" v-on:input="checkDescLength" maxlength = "100">This is a spam click...</textarea>
+          <!--<input type="text" placeholder="This is a spam click..." name="description" v-model="description"/>-->
+        </div>
+         <p class="length-text">{{ maxDescLength }} / {{ currentLength}}</p> 
+         <p class="alert">{{ errors}}</p>
+         <p class="sucess">{{ success }}</p>
+        <div class="button-wrapper">
+          <button name="submit"><span class="text">Confirm edit</span></button>
+        </div>
+      </form>
+  </div>
 </template>
 
 <script>
+
+import { collection, doc ,query, where, updateDoc,setDoc, getDocs, orderBy, isEqualTo } from 'firebase/firestore';
+import { db } from '../firebase';
+
+
 export default {
+  name: 'EventEdit',
+   props: ["id", "name", "priority", "type", "description"],
+  data() {
+    return {
+      /*name: "",
+      type: "",
+      priority: 10,
+      description: "", */
+      maxDescLength: 100,
+      currentLength: 0,
+      eventsRef: null,
+      maxEvent: [],
+      maxID: 0,
+      errors: "",
+      success: "",
+      documentID: "",
+    }
+  },
+  methods: {
+    async getEvent(id) {
+      console.log("Gettamo event", id);
+        this.eventsRef = collection(db, "Events");
+        console.log("Events ref: ", this.eventsRef);
+        const q = query(this.eventsRef);
+        const querySnapshot = await getDocs(q);
+        console.log("Query snapshots: ", querySnapshot);
+        querySnapshot.forEach((doc) => {
+
+          if (doc.data().eventID == id) {
+            this.documentID = doc.id;
+          }
+          
+
+          //console.log(doc.id, " => ", doc.data().eventID);
+            });
+
+
+            const changedDocRef = doc(db,"Events",this.documentID);
+          console.log(changedDocRef);
+            console.log("ID V FUNKCIJI: ", this.id);
+            let idInt = parseInt(this.id);
+            let priorityInt = parseInt(this.priority);
+            await setDoc(changedDocRef, {
+              eventID: idInt,
+              name: this.name,
+              type: this.type,
+              priority: priorityInt,
+              description: this.description
+
+            }); 
+        },
+  
+
+
+    async processEvent() {
+            console.log("neki");
+
+            let name = this.checkName();
+            let type = this.checkType();
+            let priority = this.checkPriority();
+            let description = this.checkDescription();
+
+
+            
+            if (name && type && priority && description) {
+                console.log("Cist vse je urede");
+
+                await this.getEvent(this.id);
+                console.log("Use je urjde id dokumenta k ga zelimo updejtat je: ", this.documentID);
+               //await this.uploadData();
+               this.errors = "";
+               this.success = "Event was successfully uploaded to the database";
+               setTimeout( () => this.$router.push({ path: '/'}), 3000);
+                
+            } else {     
+                setTimeout(function () { this.fetchHole() }.bind(this), 1000);
+                this.errors = "There was an error updating the data.";
+                console.log("Nek parametr ni urjde");
+            }
+    
+        },
+
+        uploadData() {
+          const changedDocRef = doc(db,"Events",this.documentID);
+          console.log(changedDocRef);
+          /*
+          await setDoc(changedDocRef, {
+            name: this.name,
+            type: this.type,
+            priority: this.priority,
+            description: this.description
+
+          }); */
+          console.log("Updejtamo");
+        },  
+
+        fetchHole() {
+            this.errors = "There was an error sending the data to database. Please, check for misspellings.";
+        },
+
+        checkName() {
+                  
+                  let nameRegex = new RegExp(/^[A-z0-9]+\-?[A-z0-9]*$/i);
+
+
+                  console.log(nameRegex.test(this.name)); 
+
+                  if (this.name.length > 3 && this.name.length < 30) {
+                      if (nameRegex.test(this.name)) {
+                          return true;
+                      } else {
+                          return false;
+                      }
+                  } else {
+                      return false;
+                  }
+              },
+        checkType() {
+            let typeRegex = new RegExp(/^[A-z0-9]+\-?[A-z0-9]*$/i);
+
+            if (this.type.length >= 3 && this.type.length < 30) {
+                if (typeRegex.test(this.type)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                console.log("Type ni okej");
+                return false;
+            }
+        },
+        checkPriority() {
+            if (this.priority > 0 && this.priority <= 10) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        checkDescription() {
+            let descriptionRegex = new RegExp(/^(([A-z0-9\'\"]+\-?[ \t]*)*[A-z0-9]*\-*[\. \t]*)*$/g);
+
+            if (this.description.length > 3 && this.description.length <= 100) {
+                if (descriptionRegex.test(this.description)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                console.log("description ni okej");
+                return false;
+            }
+        },
+
+        checkDescLength() {
+            let length = this.description.length;
+            this.currentLength = length;
+            if (this.currentLength >= 100) {
+                
+            }
+            console.log(this.currentLength);
+        },
+
+  },
+
+  mounted() {
+    console.log("Iz mounted");
+  },
+  
+  async created() {
+    console.log("ID: ", this.id);
+    //await this.getEvent(5);
+    
+    console.log("Iz created: ",this.priority);
+    console.log("Iz created name:", this.name);
+  }
 
 }
 </script>
 
 <style>
+  .alert { 
+        color: red;
+        margin: 0px;
+        font-weight: bold;
+    }
 
+    .sucess {
+        color:#42b983;
+        font-weight: bold;
+    }
+
+    .length-text {
+        margin-left: 3rem;
+    }
+    .input-form-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #eeee;
+        border-radius: 10px;
+       
+        height: 100%;
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+        margin: 10px;
+        justify-content:flex-start;
+        align-items: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        
+        border-radius: 10px;
+        min-width: 70%;
+        height: 70%;
+        justify-content: center;
+        border-top: 3rem solid #eeee;
+        margin-top: -100px;
+        box-shadow:
+      0 1px 1px hsl(0deg 0% 0% / 0.075),
+      0 2px 2px hsl(0deg 0% 0% / 0.075),
+      0 4px 4px hsl(0deg 0% 0% / 0.075),
+      0 8px 8px hsl(0deg 0% 0% / 0.075),
+      0 16px 16px hsl(0deg 0% 0% / 0.075)
+    ;
+    }
+
+    label {
+        width: 50%;
+        font-size: 1.5rem;
+    }
+    textarea {
+        width: 40%;
+        height: 5rem;
+        padding-left: 20px;
+        padding-top: 10px;
+        font-size: 1.1rem;
+        outline: none;
+        border-radius: 10px;
+        border-color: #eeee;
+        background: #eeee;
+        border: 1px solid gray;
+        margin-right: 20px;
+        resize: none;
+        margin-top: 20px;
+    }
+
+    textarea:focus {
+        border: 2px solid #42b983;
+        background: white;
+        
+    }
+
+
+    .button-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        height: 7rem;
+        width: 90%;
+    }
+
+   
+ button {
+  align-items: center;
+  background-image: linear-gradient(135deg, #f34079 40%, #fc894d);
+  border: 0;
+  border-radius: 10px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: "Codec cold",sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  height: 54px;
+  justify-content: center;
+  letter-spacing: .4px;
+  line-height: 1;
+  max-width: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 3px;
+  text-decoration: none;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+button:active {
+  outline: 0;
+}
+
+button:hover {
+  outline: 0;
+}
+
+button span {
+  transition: all 200ms;
+}
+
+button:hover span {
+  transform: scale(.9);
+  opacity: .75;
+}
+
+h1 {
+    width: 50%;
+    text-align: center;
+    margin: 5px;
+}
+
+@media screen and (max-width: 991px) {
+  button {
+    font-size: 15px;
+    height: 50px;
+  }
+
+  button span {
+    line-height: 50px;
+  }
+}
+
+    input {
+        width: 40%;
+        height: 2rem;
+        padding-left: 20px;
+        font-size: 1.2rem;
+        outline: none;
+        border-radius: 10px;
+        border-color: #eeee;
+        background: #eeee;
+        border: 1px solid gray;
+        margin-right: 20px;
+        margin-top: 20px;
+        
+    }
+
+    input:focus {
+        border: 2px solid #42b983;
+        background: white;
+        
+    }
+
+    input:focus::placeholder {
+        color: transparent;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+    h2 {
+        width: 100%;
+        text-align: center;
+    }
+
+    @media screen and (max-width: 600px) { 
+    form {
+        width: 100%;
+        height: auto;
+    }
+    h1 {
+        width: 100%;
+        text-align: center;
+    }
+
+    .delete {
+        width: 0% !important;
+    }
+
+    label {
+      font-size: 20px;
+    }
+
+    input {
+        width: 40%;
+        height: 2rem;
+        padding-left: 20px;
+        font-size: 1rem;
+        outline: none;
+        border-radius: 10px;
+        border-color: #eeee;
+        background: #eeee;
+        border: 1px solid gray;
+        margin-right: 20px;
+        margin-top: 20px;
+        
+    }
+
+    label {
+      font-size: 15px;
+    }
+}
 </style>
